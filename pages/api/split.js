@@ -1,47 +1,55 @@
 // pages/api/split.js
-import Xendit from 'xendit-node';
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
+  if (req.method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
+    return res.status(405).json({ message: `Method ${req.method} Not Allowed` });
   }
 
   try {
-    const { amount, email, description } = req.body;
+    const { amount, description } = req.body;
 
-    if (!amount || !email) {
-      return res.status(400).json({ message: 'amount dan email wajib diisi' });
+    // Safety check
+    if (!amount) {
+      return res.status(400).json({ message: "Amount is required" });
     }
 
-    // Init Xendit dengan API Key dari .env.local
-    const x = new Xendit({ secretKey: process.env.XENDIT_API_KEY });
-    const { Invoice } = x;
-    const invoiceSpecificOptions = {};
-    const i = new Invoice(invoiceSpecificOptions);
-
-    // Buat invoice
-    const invoice = await i.createInvoice({
-      externalID: `invoice-${Date.now()}`,
-      payerEmail: email,
-      description: description || 'Pembayaran dengan split',
-      amount: amount,
-      // Contoh split payment
-      // disini bisa diatur pembagian fee / share
-      // misalnya 90% ke merchant, 10% ke platform (kamu)
-      paymentMethods: ['BANK_TRANSFER'],
-      successRedirectURL: 'https://your-frontend-success.com',
-      failureRedirectURL: 'https://your-frontend-failed.com',
-      fees: [
-        {
-          type: 'Platform Fee',
-          value: Math.floor(amount * 0.1), // 10% fee
-        },
-      ],
+    // Hit API Xendit Create Invoice
+    const response = await fetch("https://api.xendit.co/v2/invoices", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Basic " +
+          Buffer.from(process.env.XENDIT_API_KEY + ":").toString("base64"),
+      },
+      body: JSON.stringify({
+        external_id: "order-" + Date.now(),
+        amount,
+        payer_email: "demo@customer.com",
+        description: description || "Tes Split Payment 10%",
+        fees: [
+          {
+            type: "PLATFORM_FEE",
+            value: Math.floor(amount * 0.1), // 10% masuk platform
+          },
+        ],
+      }),
     });
 
-    return res.status(200).json({ invoice });
+    const data = await response.json();
+
+    if (!response.ok) {
+      return res.status(response.status).json(data);
+    }
+
+    return res.status(200).json({
+      success: true,
+      invoice_url: data.invoice_url, // link checkout
+      data,
+    });
   } catch (error) {
-    console.error('Error buat invoice:', error);
-    return res.status(500).json({ message: 'Gagal buat invoice', error: error.message });
+    console.error(error);
+    return res.status(500).json({ error: error.message });
   }
 }
