@@ -1,24 +1,24 @@
 {
   "name": "xendit-payment",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "next": "15.5.2",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "xendit-node": "^7.0.0"
+    "next": "13.4.7",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "xendit-node": "^1.5.1"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "@tailwindcss/postcss": "^4"
   }
 }
