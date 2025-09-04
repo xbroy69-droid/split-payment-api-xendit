@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    appDir: false // pakai pages router, bukan app router
+  }
 };
 
 export default nextConfig;
