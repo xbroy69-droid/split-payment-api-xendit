@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+iimport type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
@@ -7,3 +7,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
